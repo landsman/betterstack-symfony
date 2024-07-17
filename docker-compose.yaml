@@ -1,0 +1,60 @@
+networks:
+  web:
+
+volumes:
+  db:
+  yarn-cache:
+
+services:
+  apache:
+    build:
+      context: docker/apache
+    restart: always
+    ports:
+      - "${APACHE_PORT:-8000}:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/apache/vhost.conf:/usr/local/apache2/conf/vhosts/vhost.conf
+    environment:
+      APACHE_DOCUMENT_ROOT: /var/www/html/public
+    networks:
+      - web
+    depends_on:
+      - php
+
+  php:
+    build:
+      context: docker/php
+      target: "${PHP_IMAGE_TARGET:-phpimage}"
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    image: phpimage:${PHP_IMAGE_TARGET:-phpimage}
+    user: "${UID:-1000}:${GID:-1000}"
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/local.ini
+      - .:/var/www/html
+    networks:
+      - web
+    environment:
+      PHP_IDE_CONFIG: serverName=localhost
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  composer:
+    build:
+      context: docker/php
+      target: composer
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /var/www/html
+    entrypoint: ['composer']
+    volumes:
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/local.ini
+      - .:/var/www/html
+    networks:
+      - web
