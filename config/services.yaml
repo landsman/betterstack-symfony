@@ -27,5 +27,10 @@ services:
         tags:
             - { name: monolog.handler }
 
+    # processes records messages according to PSR-3 rules - e.g. replace {route} by context.route
+    Monolog\Processor\PsrLogMessageProcessor:
+        tags:
+            - { name: monolog.processor }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
