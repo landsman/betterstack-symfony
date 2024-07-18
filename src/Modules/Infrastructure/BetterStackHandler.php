@@ -6,6 +6,7 @@ use Logtail\Monolog\LogtailHandler;
 use Logtail\Monolog\LogtailHandlerBuilder;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Monolog\Processor\PsrLogMessageProcessor;
 
 class BetterStackHandler extends AbstractProcessingHandler
 {
@@ -18,6 +19,8 @@ class BetterStackHandler extends AbstractProcessingHandler
             ->withFlushIntervalMilliseconds(500)
             ->withExceptionThrowing(true)
             ->build();
+
+        $this->logtailHandler->pushProcessor(new PsrLogMessageProcessor());
 
         parent::__construct($level, $bubble);
     }
