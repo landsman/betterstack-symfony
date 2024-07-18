@@ -52,7 +52,7 @@ services:
         - GID=${GID:-1000}
     user: "${UID:-1000}:${GID:-1000}"
     working_dir: /var/www/html
-    entrypoint: ['composer']
+    entrypoint: ['composer', 'install']
     volumes:
       - ./docker/php/php.ini:/usr/local/etc/php/conf.d/local.ini
       - .:/var/www/html
